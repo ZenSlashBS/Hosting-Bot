@@ -7,7 +7,7 @@ import sqlite3
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here_akiru_team_2023'  # Change this to a strong secret key
+app.secret_key = ''  # Change this to a strong secret key
 app.config['UPLOAD_FOLDER'] = 'user_bots'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
@@ -326,4 +326,4 @@ def delete_file(file_id):
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8080)
