@@ -7,7 +7,7 @@ import sqlite3
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = ''  # Change this to a strong secret key
+app.secret_key = 'wtf'  # Change this to a strong secret key
 app.config['UPLOAD_FOLDER'] = 'user_bots'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
