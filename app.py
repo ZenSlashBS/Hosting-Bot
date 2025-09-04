@@ -42,6 +42,7 @@ def init_db():
         logger.info("Database initialized successfully")
     except Exception as e:
         logger.error(f"Database init error: {str(e)}")
+        raise
 
 init_db()
 
@@ -54,6 +55,7 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     try:
+        logger.debug("Accessing index route")
         if 'user_id' not in session:
             logger.debug("No user_id in session, redirecting to login")
             return redirect(url_for('login'))
@@ -67,15 +69,16 @@ def index():
             file_id, filename, filetype = file
             is_running = file_id in running_processes and running_processes[file_id].poll() is None
             file_status.append({'id': file_id, 'name': filename, 'type': filetype, 'running': is_running})
-        logger.debug(f"Rendering index with files: {file_status}")
+        logger.debug(f"Rendering index.html with files: {file_status}")
         return render_template('index.html', files=file_status, username=session.get('username'))
     except Exception as e:
         logger.error(f"Index error: {str(e)}")
-        return "Internal Server Error", 500
+        return f"Internal Server Error: {str(e)}", 500
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     try:
+        logger.debug("Accessing login route")
         if request.method == 'POST':
             username = request.form['username']
             password = request.form['password']
@@ -92,14 +95,16 @@ def login():
             else:
                 flash('Invalid credentials', 'error')
                 logger.warning(f"Failed login attempt for {username}")
+        logger.debug("Rendering login.html")
         return render_template('login.html')
     except Exception as e:
         logger.error(f"Login error: {str(e)}")
-        return "Internal Server Error", 500
+        return f"Internal Server Error: {str(e)}", 500
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     try:
+        logger.debug("Accessing register route")
         if request.method == 'POST':
             username = request.form['username']
             password = request.form['password']
@@ -116,24 +121,27 @@ def register():
                 logger.warning(f"Registration failed: Username {username} exists")
             finally:
                 conn.close()
+        logger.debug("Rendering register.html")
         return render_template('register.html')
     except Exception as e:
         logger.error(f"Register error: {str(e)}")
-        return "Internal Server Error", 500
+        return f"Internal Server Error: {str(e)}", 500
 
 @app.route('/logout')
 def logout():
     try:
+        logger.debug("Accessing logout route")
         session.clear()
         logger.debug("User logged out")
         return redirect(url_for('login'))
     except Exception as e:
         logger.error(f"Logout error: {str(e)}")
-        return "Internal Server Error", 500
+        return f"Internal Server Error: {str(e)}", 500
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
     try:
+        logger.debug("Accessing upload route")
         if 'user_id' not in session:
             logger.debug("No user_id in session, redirecting to login")
             return redirect(url_for('login'))
@@ -177,11 +185,12 @@ def upload_file():
         return redirect(url_for('index'))
     except Exception as e:
         logger.error(f"Upload error: {str(e)}")
-        return "Internal Server Error", 500
+        return f"Internal Server Error: {str(e)}", 500
 
 @app.route('/control/<int:file_id>/<action>')
 def control_file(file_id, action):
     try:
+        logger.debug(f"Accessing control route for file_id={file_id}, action={action}")
         if 'user_id' not in session:
             logger.debug("No user_id in session, redirecting to login")
             return redirect(url_for('login'))
@@ -251,7 +260,7 @@ def control_file(file_id, action):
         return redirect(url_for('index'))
     except Exception as e:
         logger.error(f"Control error: {str(e)}")
-        return "Internal Server Error", 500
+        return f"Internal Server Error: {str(e)}", 500
 
 def collect_logs(file_id, process):
     try:
@@ -268,6 +277,7 @@ def collect_logs(file_id, process):
 @app.route('/logs/<int:file_id>')
 def get_logs(file_id):
     try:
+        logger.debug(f"Accessing logs for file_id={file_id}")
         if 'user_id' not in session:
             logger.debug("No user_id in session, redirecting to login")
             return redirect(url_for('login'))
@@ -287,11 +297,12 @@ def get_logs(file_id):
         return jsonify(process_logs[file_id][-100:])
     except Exception as e:
         logger.error(f"Logs error: {str(e)}")
-        return "Internal Server Error", 500
+        return f"Internal Server Error: {str(e)}", 500
 
 @app.route('/delete/<int:file_id>', methods=['POST'])
 def delete_file(file_id):
     try:
+        logger.debug(f"Accessing delete route for file_id={file_id}")
         if 'user_id' not in session:
             logger.debug("No user_id in session, redirecting to login")
             return redirect(url_for('login'))
@@ -323,7 +334,7 @@ def delete_file(file_id):
         return redirect(url_for('index'))
     except Exception as e:
         logger.error(f"Delete error: {str(e)}")
-        return "Internal Server Error", 500
+        return f"Internal Server Error: {str(e)}", 500
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
