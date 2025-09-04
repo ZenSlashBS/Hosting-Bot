@@ -4,7 +4,12 @@ WORKDIR /app
 COPY app.py .
 COPY requirements.txt .
 COPY Procfile .
-COPY static/ static/
+COPY register.html .
+COPY index.html .
+COPY layout.html .
+COPY login.html .
+COPY script.js .
+COPY style.css .
 COPY templates/ templates/
 RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 8080
